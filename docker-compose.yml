@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  bookstore-app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - mock-payment-service
+    networks:
+      - bookstore-network
+
+  mock-payment-service:
+    image: "busybox"
+    command: "httpd -f -p 8081"
+    networks:
+      - bookstore-network
+    expose:
+      - "8081"
+
+networks:
+  bookstore-network:
+    driver: bridge
