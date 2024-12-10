@@ -8,33 +8,58 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres-db
+      - postgres-db-primary
+      - postgres-db-replica
       - redis
     environment:
-      - SPRING_APPLICATION_NAME=OnlineBookStore
-      - SERVER_PORT=8080
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/bookstore_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_PRIMARY_URL=jdbc:postgresql://postgres-db-primary:5432/bookstore_db_primary
+      - SPRING_DATASOURCE_PRIMARY_USERNAME=postgres
+      - SPRING_DATASOURCE_PRIMARY_PASSWORD=postgres
+      - SPRING_DATASOURCE_REPLICA_URL=jdbc:postgresql://postgres-db-replica:5432/bookstore_db_replica
+      - SPRING_DATASOURCE_REPLICA_USERNAME=postgres
+      - SPRING_DATASOURCE_REPLICA_PASSWORD=postgres
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
-      - SECURITY_JWT_SECRET_KEY=your-secret-key
-      - SECURITY_JWT_EXPIRATION_TIME=3600000
-      - LOGGING_FILE_NAME=/var/log/online-bookstore.log
+      - SPRING_PROFILES_ACTIVE=prod
     volumes:
       - logs:/var/log/online-bookstore
 
-  postgres-db:
+  postgres-db-primary:
     image: postgres:15
-    container_name: postgres-db
+    container_name: postgres-db-primary
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: bookstore_db
+      POSTGRES_DB: bookstore_db_primary
+      # Replication-related settings
+      PG_PRIMARY_ROLE: "master"
+      PG_REPLICATION_ROLE: "primary"
+      PG_REPLICATION_USER: "replication_user"
+      PG_REPLICATION_PASSWORD: "replication_password"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_primary_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d # Custom initialization scripts for replication setup
+
+  postgres-db-replica:
+    image: postgres:15
+    container_name: postgres-db-replica
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bookstore_db_replica
+      # Replication-related settings for the replica
+      PG_PRIMARY_HOST: "postgres-db-primary" # Point to the primary DB
+      PG_REPLICATION_USER: "replication_user"
+      PG_REPLICATION_PASSWORD: "replication_password"
+      PG_REPLICATION_ROLE: "replica"
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres-db-primary
 
   redis:
     image: redis:7.0
@@ -64,7 +89,8 @@ services:
       - grafana_data:/var/lib/grafana
 
 volumes:
-  postgres_data:
+  postgres_primary_data:
+  postgres_replica_data:
   logs:
   prometheus_data:
   grafana_data:
