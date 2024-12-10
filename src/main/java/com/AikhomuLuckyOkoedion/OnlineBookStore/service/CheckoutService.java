@@ -20,12 +20,21 @@ public class CheckoutService {
     @Autowired
     private ShoppingCartService cartService;
 
-    public CheckoutService(OrderRepository mockRepository, PaymentSimulator mockPaymentSimulator) {
+    @Autowired
+    private CustomMetricService customMetricService;
+
+    public CheckoutService(OrderRepository mockRepository, PaymentSimulator mockPaymentSimulator, ShoppingCartService cartService) {
         this.orderRepository = mockRepository;
         this.paymentSimulator = mockPaymentSimulator;
+        this.cartService = cartService;
     }
 
+
+
     public CompletableFuture<Order> processCheckout(String userId, Order.PaymentMethod paymentMethod) {
+
+        customMetricService.incrementCheckoutCounter();
+
         // Simulate fetching cart contents
 
         System.out.println("Fetching cart for userId: " + userId);

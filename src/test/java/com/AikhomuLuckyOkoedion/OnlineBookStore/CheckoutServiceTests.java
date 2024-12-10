@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,35 +26,35 @@ class CheckoutServiceTests {
     private CheckoutService checkoutService;
     private ShoppingCartService cartService;
     private OrderRepository orderRepository;
+    private PaymentSimulator paymentSimulator;
 
     @BeforeEach
     void setUp() {
         cartService = mock(ShoppingCartService.class);
         orderRepository = mock(OrderRepository.class);
-        checkoutService = new CheckoutService(orderRepository, cartService);
+        paymentSimulator = mock(PaymentSimulator.class);
+        checkoutService = new CheckoutService(orderRepository, paymentSimulator, cartService);
     }
 
     @Test
     void testProcessCheckoutWithMockedPayment() throws ExecutionException, InterruptedException {
-        OrderRepository mockRepository = mock(OrderRepository.class);
-        PaymentSimulator mockPaymentSimulator = mock(PaymentSimulator.class);
-        CheckoutService checkoutService = new CheckoutService(mockRepository, mockPaymentSimulator);
+        CheckoutService checkoutService = new CheckoutService(orderRepository, paymentSimulator, cartService);
 
-        when(mockPaymentSimulator.simulatePayment(Order.PaymentMethod.WEB, "testUser")).thenReturn(true);
+        when(paymentSimulator.simulatePayment(Order.PaymentMethod.WEB, "testUser")).thenReturn(true);
 
         var orderFuture = checkoutService.processCheckout("testUser", Order.PaymentMethod.WEB);
         Order order = orderFuture.get();
 
         assertNotNull(order);
         assertTrue(order.isSuccess());
-        verify(mockRepository, times(1)).save(order);
+        verify(orderRepository, times(1)).save(order);
     }
 
 
     @Test
     void testProcessCheckoutSuccess() throws ExecutionException, InterruptedException {
         String userId = "testUser";
-        when(cartService.getCartContents(userId)).thenReturn("[{\"title\":\"Book1\"}]");
+        when(cartService.getCartContents(userId)).thenReturn(Collections.singletonList("[{\"title\":\"Book1\"}]"));
 
         var futureOrder = checkoutService.processCheckout(userId, Order.PaymentMethod.WEB);
         Order order = futureOrder.get();
@@ -66,7 +67,7 @@ class CheckoutServiceTests {
     @Test
     void testProcessCheckoutWithEmptyCart() {
         String userId = "testUser";
-        when(cartService.getCartContents(userId)).thenReturn("[]");
+        when(cartService.getCartContents(userId)).thenReturn(Collections.singletonList("[]"));
 
         assertThrows(IllegalStateException.class,
             () -> checkoutService.processCheckout(userId, Order.PaymentMethod.WEB));
@@ -75,7 +76,7 @@ class CheckoutServiceTests {
     @Test
     void testSimulatePaymentFailures() throws ExecutionException, InterruptedException {
         String userId = "testUser";
-        when(cartService.getCartContents(userId)).thenReturn("[{\"title\":\"Book1\"}]");
+        when(cartService.getCartContents(userId)).thenReturn(Collections.singletonList("[{\"title\":\"Book1\"}]"));
 
         var futureOrder = checkoutService.processCheckout(userId, Order.PaymentMethod.USSD);
         Order order = futureOrder.get();

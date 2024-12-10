@@ -1,5 +1,6 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.controller;
 
+import com.AikhomuLuckyOkoedion.OnlineBookStore.repository.OrderRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.util.ReceiptGenerator;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/receipt")
@@ -21,7 +23,7 @@ public class ReceiptController {
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<byte[]> downloadReceipt(@PathVariable Long orderId) throws IOException {
+    public ResponseEntity<byte[]> downloadReceipt(@PathVariable UUID orderId) throws IOException {
         var order = orderRepository.findById(orderId)
             .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 

@@ -43,3 +43,13 @@ This is a demonstration of a modern, scalable bookstore application built with *
 - **POST**: /books: Add a new book to the inventory.
 - **GET**: /orders/history/{userId}: View purchase history for a specific user.
 - **POST**: /orders/checkout: Simulate a checkout process with options WEB, USSD, or TRANSFER.
+
+### Building and Running with Docker
+
+1. **Ensure Docker and Docker Compose are Installed**
+    - Docker: [Install Docker](https://docs.docker.com/get-docker/)
+    - Docker Compose: [Install Docker Compose](https://docs.docker.com/compose/install/)
+
+2. **Build and Run the Application**
+   ```bash
+   docker-compose up --build
