@@ -48,7 +48,7 @@ public class JpaConfig {
     }
 
     // Primary EntityManagerFactory
-    @Bean
+    @Bean(name = "entityManagerFactory")
     @Primary
     public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
         DataSource primaryDataSource) {
@@ -57,11 +57,12 @@ public class JpaConfig {
         factoryBean.setPackagesToScan("com.AikhomuLuckyOkoedion.OnlineBookStore.entity");
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         factoryBean.setJpaProperties(hibernateProperties());
+        factoryBean.setPersistenceUnitName("primary");
         return factoryBean;
     }
 
     // Replica EntityManagerFactory
-    @Bean
+    @Bean(name = "replicaEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean replicaEntityManagerFactory(
         DataSource replicaDataSource) {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
@@ -69,11 +70,13 @@ public class JpaConfig {
         factoryBean.setPackagesToScan("com.AikhomuLuckyOkoedion.OnlineBookStore.entity");
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         factoryBean.setJpaProperties(hibernateProperties());
+        factoryBean.setPersistenceUnitName("replica");
         return factoryBean;
     }
 
     // Transaction Manager for Primary EntityManager
     @Bean
+    @Primary
     public PlatformTransactionManager transactionManager(
         LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory) {
         return new JpaTransactionManager(primaryEntityManagerFactory.getObject());
