@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
+@Table(name = "`Order`")
 public class Order {
 
     public enum PaymentMethod {

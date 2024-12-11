@@ -2,7 +2,6 @@ package com.AikhomuLuckyOkoedion.OnlineBookStore.controller;
 
 
 import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Order;
-import com.AikhomuLuckyOkoedion.OnlineBookStore.repository.OrderRepository;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.CheckoutService;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,42 +1,88 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.config;
 
-import jakarta.persistence.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
 public class JpaConfig {
 
+    // Primary DataSource
     @Bean
+    @Primary
+    public DataSource primaryDataSource(
+        @Value("${spring.datasource.primary.url}") String url,
+        @Value("${spring.datasource.primary.username}") String username,
+        @Value("${spring.datasource.primary.password}") String password) {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        return dataSource;
+    }
+
+    // Replica DataSource
+    @Bean
+    public DataSource replicaDataSource(
+        @Value("${spring.datasource.replica.url}") String url,
+        @Value("${spring.datasource.replica.username}") String username,
+        @Value("${spring.datasource.replica.password}") String password) {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        return dataSource;
+    }
+
+    // Primary EntityManagerFactory
+    @Bean
+    @Primary
     public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
-        @Qualifier("primaryDataSource") DataSource dataSource) {
+        DataSource primaryDataSource) {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-        factoryBean.setDataSource(dataSource);
+        factoryBean.setDataSource(primaryDataSource);
         factoryBean.setPackagesToScan("com.AikhomuLuckyOkoedion.OnlineBookStore.entity");
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        factoryBean.setJpaProperties(hibernateProperties());
         return factoryBean;
     }
 
+    // Replica EntityManagerFactory
     @Bean
     public LocalContainerEntityManagerFactoryBean replicaEntityManagerFactory(
-        @Qualifier("replicaDataSource") DataSource dataSource) {
+        DataSource replicaDataSource) {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-        factoryBean.setDataSource(dataSource);
+        factoryBean.setDataSource(replicaDataSource);
         factoryBean.setPackagesToScan("com.AikhomuLuckyOkoedion.OnlineBookStore.entity");
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        factoryBean.setJpaProperties(hibernateProperties());
         return factoryBean;
     }
 
+    // Transaction Manager for Primary EntityManager
     @Bean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
+    public PlatformTransactionManager transactionManager(
+        LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory) {
+        return new JpaTransactionManager(primaryEntityManagerFactory.getObject());
+    }
+
+    private Properties hibernateProperties() {
+        Properties properties = new Properties();
+        properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        properties.put("hibernate.hbm2ddl.auto", "update");
+        return properties;
     }
 }
-
