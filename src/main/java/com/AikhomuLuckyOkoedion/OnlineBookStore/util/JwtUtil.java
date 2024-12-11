@@ -1,7 +1,5 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.util;
 
-
-
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -36,4 +34,3 @@ public class JwtUtil {
         }
     }
 }
-

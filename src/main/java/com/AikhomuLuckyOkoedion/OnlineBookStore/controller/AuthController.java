@@ -1,6 +1,5 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.controller;
 
-
 import com.AikhomuLuckyOkoedion.OnlineBookStore.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,4 +21,3 @@ public class AuthController {
         return JwtUtil.generateToken(username);
     }
 }
-
