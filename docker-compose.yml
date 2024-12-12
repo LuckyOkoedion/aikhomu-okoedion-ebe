@@ -33,14 +33,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bookstore_db_primary
-      # Replication-related settings
-      PG_PRIMARY_ROLE: "master"
-      PG_REPLICATION_ROLE: "primary"
-      PG_REPLICATION_USER: "replication_user"
-      PG_REPLICATION_PASSWORD: "replication_password"
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_primary_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d # Custom initialization scripts for replication setup
+      - ./init-scripts-primary:/docker-entrypoint-initdb.d
+      - ./pg_hba_primary.conf:/tmp/pg_hba.conf
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=replica"
+      - "-c"
+      - "max_wal_senders=3"
+      - "-c"
+      - "wal_keep_size=64"
 
   postgres-db-replica:
     image: postgres:15
@@ -51,15 +56,18 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bookstore_db_replica
-      # Replication-related settings for the replica
-      PG_PRIMARY_HOST: "postgres-db-primary" # Point to the primary DB
+      PG_PRIMARY_HOST: "postgres-db-primary"
       PG_REPLICATION_USER: "replication_user"
       PG_REPLICATION_PASSWORD: "replication_password"
-      PG_REPLICATION_ROLE: "replica"
+      PGDATA: /var/lib/postgresql/data/pgdatareplica
     volumes:
       - postgres_replica_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./pg_hba_replica.conf:/tmp/pg_hba.conf
+    restart: always
     depends_on:
       - postgres-db-primary
+
 
   redis:
     image: redis:7.0

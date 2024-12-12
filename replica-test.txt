@@ -1,0 +1,86 @@
+1. Check the Primary Node
+Run the following SQL query on the primary PostgreSQL server to verify that the replica is connected and replication is in progress:
+
+
+SELECT client_addr, state, sync_state, sent_lsn, write_lsn, flush_lsn, replay_lsn
+FROM pg_stat_replication;
+
+Key Fields to Observe:
+client_addr: The IP address of the replica server.
+state: The state of the replication process. It should show streaming.
+sync_state: The synchronization state of the replica. Common values:
+sync: Fully synchronized.
+async: Asynchronous replication.
+sent_lsn, write_lsn, flush_lsn, replay_lsn: These represent the replication log positions. The values should increment over time, indicating active replication.
+
+2. Check the Replica Node
+On the replica, run the following query to confirm that it is in standby mode and receiving updates from the primary:
+
+
+SELECT pg_is_in_recovery();
+
+
+Expected Result:
+The result should be true, indicating that the server is in recovery mode and acting as a replica.
+
+3. Check Replication Lag
+Replication lag is the delay between the primary and replica in terms of applied WAL (Write-Ahead Log) entries.
+
+On the replica, you can check the current WAL replay position with:
+
+
+SELECT pg_last_xlog_replay_location();
+
+
+Compare this with the sent_lsn from the pg_stat_replication query on the primary. A small difference indicates minimal lag.
+
+4. Test Replication
+You can perform a simple test by creating a new table or inserting a row into an existing table on the primary node and verifying its presence on the replica.
+
+On the Primary:
+
+CREATE TABLE replication_test (id SERIAL PRIMARY KEY, message TEXT);
+INSERT INTO replication_test (message) VALUES ('Replication is working!');
+
+On the Replica:
+Check for the presence of the new table and row:
+
+SELECT * FROM replication_test;
+
+The table and data should appear on the replica if replication is functioning correctly.
+
+5. Check Logs
+Examine the PostgreSQL logs on both the primary and replica servers for any errors or warnings related to replication.
+
+Primary Logs:
+Check for messages confirming WAL files are being sent to the replica.
+
+Replica Logs:
+Check for messages confirming the receipt and application of WAL files.
+
+On Linux, logs are typically located in /var/lib/postgresql/data/logs or a similar directory. Use docker logs <container_name> if running in Docker.
+
+6. Advanced Verification
+For a more detailed check, you can use replication-specific system functions:
+
+Check Replication Slots (Primary):
+
+
+SELECT * FROM pg_replication_slots;
+
+Look for active = true for your replication slot.
+
+Check Replication Statistics (Primary):
+
+SELECT * FROM pg_stat_wal_receiver;
+
+This shows detailed information about the WAL receiver process.
+
+Check the Replica Logs: Look for messages like:
+
+LOG:  database system is ready to accept read-only connections
+Verify Replication Status: From the primary, use:
+
+SELECT * FROM pg_stat_replication;
+
+The output should list the replica, confirming that it is actively streaming from the primary.

@@ -53,3 +53,13 @@ This is a demonstration of a modern, scalable bookstore application built with *
 2. **Build and Run the Application**
    ```bash
    docker-compose up --build
+
+
+### Swagger Docs Path:
+
+http://localhost:8080/swagger-ui/index.html
+
+### Test user credentials:
+
+username: demoUser
+password: demoPassword
