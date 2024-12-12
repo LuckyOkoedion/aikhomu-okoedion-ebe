@@ -25,6 +25,9 @@ public class Order {
     @Lob
     private String items; // JSON representation of the cart contents
 
+    @Version
+    private Long version;
+
     private boolean success;
 
     public UUID getId() {
@@ -65,6 +68,14 @@ public class Order {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     @Override

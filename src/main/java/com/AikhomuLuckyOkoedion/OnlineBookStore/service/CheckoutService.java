@@ -5,6 +5,7 @@ import com.AikhomuLuckyOkoedion.OnlineBookStore.external.PaymentSimulator;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -31,6 +32,7 @@ public class CheckoutService {
 
 
 
+    @Transactional
     public CompletableFuture<Order> processCheckout(String userId, Order.PaymentMethod paymentMethod) {
 
         customMetricService.incrementCheckoutCounter();

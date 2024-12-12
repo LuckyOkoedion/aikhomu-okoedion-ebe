@@ -26,6 +26,9 @@ public class Book {
     @Column(nullable = false)
     private int year;
 
+    @Version
+    private Long version;
+
     public UUID getId() {
         return id;
     }
@@ -74,6 +77,13 @@ public class Book {
         this.year = year;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 
     @Override
     public String toString() {

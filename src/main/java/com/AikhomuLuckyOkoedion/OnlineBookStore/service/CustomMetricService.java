@@ -3,6 +3,7 @@ package com.AikhomuLuckyOkoedion.OnlineBookStore.service;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Counter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomMetricService {
@@ -25,14 +26,17 @@ public class CustomMetricService {
             .register(meterRegistry);
     }
 
+    @Transactional
     public void incrementCheckoutCounter() {
         checkoutCounter.increment();
     }
 
+    @Transactional
     public void incrementCartAdditionCounter() {
         cartAdditionCounter.increment();
     }
 
+    @Transactional
     public void incrementSearchCounter() {
         searchCounter.increment();
     }
