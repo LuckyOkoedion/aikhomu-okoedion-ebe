@@ -1,6 +1,6 @@
 # Bookstore Application
 
-This is a demonstration of a modern, scalable bookstore application built with **Java 21**, **Spring Boot 3**, and the latest development best practices. The system showcases key features such as book inventory management, order checkout, payment simulation, and purchase history.
+This is a demonstration of a modern, scalable bookstore application built with **Java 21**, **Spring Boot 3**, and the latest development best practices. The system showcases key features such as book inventory management, orders checkout, payment simulation, and purchase history.
 
 ## Features
 - **Book Inventory**: Manage a collection of books with attributes like title, author, genre, and ISBN.

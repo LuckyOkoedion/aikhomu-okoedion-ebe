@@ -3,6 +3,8 @@ package com.AikhomuLuckyOkoedion.OnlineBookStore.service;
 
 import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Book;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.repository.BookRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class BookService {
+
+    Logger LOGGER = LoggerFactory.getLogger(BookService.class);
 
     @Autowired
     private BookRepository bookRepository;
@@ -26,7 +30,15 @@ public class BookService {
 
     @Transactional
     public Book addBook(Book book) {
-        return bookRepository.save(book);
+
+        try {
+            return bookRepository.save(book);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        }
+
+
     }
 }
 

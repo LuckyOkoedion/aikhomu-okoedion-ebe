@@ -1,7 +1,7 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.controller;
 
 
-import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Order;
+import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Orders;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.CheckoutService;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,12 @@ public class OrderController {
 
 
     @GetMapping("/history/{userId}")
-    public List<Order> getPurchaseHistory(@PathVariable String userId) {
+    public List<Orders> getPurchaseHistory(@PathVariable String userId) {
         return orderService.getPurchaseHistory(userId);
     }
 
     @PostMapping("/checkout")
-    public Order checkout(@RequestParam String userId, @RequestParam Order.PaymentMethod method)
+    public Orders checkout(@RequestParam String userId, @RequestParam Orders.PaymentMethod method)
         throws ExecutionException, InterruptedException {
         return checkoutService.processCheckout(userId, method).get();
     }

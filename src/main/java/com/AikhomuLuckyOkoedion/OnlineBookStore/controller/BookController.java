@@ -2,6 +2,7 @@ package com.AikhomuLuckyOkoedion.OnlineBookStore.controller;
 
 
 import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Book;
+import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.BookDto;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.BookService;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.CustomMetricService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,14 @@ public class BookController {
     }
 
     @PostMapping
-    public Book addBook(@RequestBody Book book) {
-        return bookService.addBook(book);
+    public Book addBook(@RequestBody BookDto book) {
+        Book theBook = new Book();
+        theBook.setAuthor(book.getAuthor());
+        theBook.setGenre(book.getGenre());
+        theBook.setIsbn(book.getIsbn());
+        theBook.setTitle(book.getTitle());
+        theBook.setYear(book.getYear());
+        return bookService.addBook(theBook);
     }
 }
 

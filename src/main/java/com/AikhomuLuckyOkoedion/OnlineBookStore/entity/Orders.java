@@ -5,8 +5,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "`Order`")
-public class Order {
+public class Orders {
 
     public enum PaymentMethod {
         WEB, USSD, TRANSFER
@@ -25,8 +24,7 @@ public class Order {
     @Lob
     private String items; // JSON representation of the cart contents
 
-    @Version
-    private Long version;
+
 
     private boolean success;
 
@@ -70,13 +68,6 @@ public class Order {
         this.success = success;
     }
 
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
 
     @Override
     public String toString() {

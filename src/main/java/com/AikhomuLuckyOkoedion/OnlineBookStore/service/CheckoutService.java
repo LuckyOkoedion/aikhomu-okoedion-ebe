@@ -1,6 +1,6 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.service;
 
-import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Order;
+import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Orders;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.external.PaymentSimulator;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class CheckoutService {
 
 
     @Transactional
-    public CompletableFuture<Order> processCheckout(String userId, Order.PaymentMethod paymentMethod) {
+    public CompletableFuture<Orders> processCheckout(String userId, Orders.PaymentMethod paymentMethod) {
 
         customMetricService.incrementCheckoutCounter();
 
@@ -56,14 +56,14 @@ public class CheckoutService {
 
             boolean success = paymentSimulator.simulatePayment(paymentMethod, userId);
 
-            Order order = new Order();
-            order.setUserId(userId);
-            order.setPaymentMethod(paymentMethod);
-            order.setSuccess(success);
-            order.setItems(cartContents.toString());
+            Orders orders = new Orders();
+            orders.setUserId(userId);
+            orders.setPaymentMethod(paymentMethod);
+            orders.setSuccess(success);
+            orders.setItems(cartContents.toString());
 
             // Save order to DB
-            return orderRepository.save(order);
+            return orderRepository.save(orders);
         });
     }
 

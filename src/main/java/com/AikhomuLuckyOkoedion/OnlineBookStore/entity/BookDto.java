@@ -1,40 +1,12 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.entity;
 
+public class BookDto {
 
-import jakarta.persistence.*;
-import java.util.UUID;
-
-@Entity
-public class Book {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false)
     private String genre;
-
-    @Column(nullable = false)
     private String isbn;
-
-    @Column(nullable = false)
     private String author;
-
-    @Column(nullable = false)
     private int year;
-
-
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -76,17 +48,14 @@ public class Book {
         this.year = year;
     }
 
-
     @Override
     public String toString() {
-        return "Book{" +
-            "id=" + id +
-            ", title='" + title + '\'' +
-            ", genre='" + genre + '\'' +
-            ", isbn='" + isbn + '\'' +
-            ", author='" + author + '\'' +
-            ", year=" + year +
-            '}';
+        return "BookDto{" +
+                "title='" + title + '\'' +
+                ", genre='" + genre + '\'' +
+                ", isbn='" + isbn + '\'' +
+                ", author='" + author + '\'' +
+                ", year=" + year +
+                '}';
     }
 }
-

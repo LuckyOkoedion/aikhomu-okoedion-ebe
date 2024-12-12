@@ -1,7 +1,7 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore.controller;
 
 
-import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Order;
+import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Orders;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.CheckoutService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +18,9 @@ public class CheckoutController {
     }
 
     @PostMapping
-    public CompletableFuture<Order> checkout(
+    public CompletableFuture<Orders> checkout(
         @RequestParam String userId,
-        @RequestParam Order.PaymentMethod paymentMethod
+        @RequestParam Orders.PaymentMethod paymentMethod
     ) {
         return checkoutService.processCheckout(userId, paymentMethod);
     }

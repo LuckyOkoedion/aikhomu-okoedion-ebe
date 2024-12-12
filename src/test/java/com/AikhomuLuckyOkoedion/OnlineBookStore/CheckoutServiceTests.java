@@ -1,17 +1,14 @@
 package com.AikhomuLuckyOkoedion.OnlineBookStore;
 
 
-import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Order;
+import com.AikhomuLuckyOkoedion.OnlineBookStore.entity.Orders;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.external.PaymentSimulator;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.repository.OrderRepository;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.CheckoutService;
 import com.AikhomuLuckyOkoedion.OnlineBookStore.service.ShoppingCartService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
@@ -40,14 +37,14 @@ class CheckoutServiceTests {
     void testProcessCheckoutWithMockedPayment() throws ExecutionException, InterruptedException {
         CheckoutService checkoutService = new CheckoutService(orderRepository, paymentSimulator, cartService);
 
-        when(paymentSimulator.simulatePayment(Order.PaymentMethod.WEB, "testUser")).thenReturn(true);
+        when(paymentSimulator.simulatePayment(Orders.PaymentMethod.WEB, "testUser")).thenReturn(true);
 
-        var orderFuture = checkoutService.processCheckout("testUser", Order.PaymentMethod.WEB);
-        Order order = orderFuture.get();
+        var orderFuture = checkoutService.processCheckout("testUser", Orders.PaymentMethod.WEB);
+        Orders orders = orderFuture.get();
 
-        assertNotNull(order);
-        assertTrue(order.isSuccess());
-        verify(orderRepository, times(1)).save(order);
+        assertNotNull(orders);
+        assertTrue(orders.isSuccess());
+        verify(orderRepository, times(1)).save(orders);
     }
 
 
@@ -56,12 +53,12 @@ class CheckoutServiceTests {
         String userId = "testUser";
         when(cartService.getCartContents(userId)).thenReturn(Collections.singletonList("[{\"title\":\"Book1\"}]"));
 
-        var futureOrder = checkoutService.processCheckout(userId, Order.PaymentMethod.WEB);
-        Order order = futureOrder.get();
+        var futureOrder = checkoutService.processCheckout(userId, Orders.PaymentMethod.WEB);
+        Orders orders = futureOrder.get();
 
-        assertNotNull(order, "Order should not be null");
-        assertTrue(order.isSuccess(), "Order should be successful");
-        verify(orderRepository, times(1)).save(order);
+        assertNotNull(orders, "Order should not be null");
+        assertTrue(orders.isSuccess(), "Order should be successful");
+        verify(orderRepository, times(1)).save(orders);
     }
 
     @Test
@@ -70,7 +67,7 @@ class CheckoutServiceTests {
         when(cartService.getCartContents(userId)).thenReturn(Collections.singletonList("[]"));
 
         assertThrows(IllegalStateException.class,
-            () -> checkoutService.processCheckout(userId, Order.PaymentMethod.WEB));
+            () -> checkoutService.processCheckout(userId, Orders.PaymentMethod.WEB));
     }
 
     @Test
@@ -78,11 +75,11 @@ class CheckoutServiceTests {
         String userId = "testUser";
         when(cartService.getCartContents(userId)).thenReturn(Collections.singletonList("[{\"title\":\"Book1\"}]"));
 
-        var futureOrder = checkoutService.processCheckout(userId, Order.PaymentMethod.USSD);
-        Order order = futureOrder.get();
+        var futureOrder = checkoutService.processCheckout(userId, Orders.PaymentMethod.USSD);
+        Orders orders = futureOrder.get();
 
-        assertNotNull(order, "Order should not be null");
-        assertTrue(order.isSuccess() || !order.isSuccess(), "Payment result should be realistic");
+        assertNotNull(orders, "Order should not be null");
+        assertTrue(orders.isSuccess() || !orders.isSuccess(), "Payment result should be realistic");
     }
 
 
